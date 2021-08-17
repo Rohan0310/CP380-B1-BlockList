@@ -22,16 +22,38 @@ namespace CP380_B1_BlockList.Models
             Chain.Add(block);
         }
 
+        public Block GetLatestBlock()
+        {
+            return Chain[Chain.Count - 1];
+        }
         public void AddBlock(Block block)
         {
             // TODO
+            Block latestBlock = GetLatestBlock() ;
+            block.Nonce = latestBlock.Nonce + 1;
+            block.PreviousHash = latestBlock.Hash;
+            block.Hash = block.CalculateHash();
+            Chain.Add(block);
         }
 
         public bool IsValid()
         {
-            // TODO
+            for (int i = 1; i < Chain.Count; i++)
+            {
+                Block currentBlock = Chain[i];
+                Block previousBlock = Chain[i - 1];
 
-            return false;
+                if (currentBlock.Hash != currentBlock.CalculateHash())
+                {
+                    return false;
+                }
+
+                if (currentBlock.PreviousHash != previousBlock.Hash)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

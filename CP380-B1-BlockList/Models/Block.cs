@@ -22,7 +22,7 @@ namespace CP380_B1_BlockList.Models
             PreviousHash = previousHash;
             Data = data;
             Hash = CalculateHash();
-        }
+        }                             
 
         //
         // JSON serialisation:
@@ -33,13 +33,17 @@ namespace CP380_B1_BlockList.Models
             var sha256 = SHA256.Create();
             var json = JsonSerializer.Serialize(Data);
 
+            string jsonString = JsonSerializer.Serialize(Data);
+
+
             //
             // TODO
             //
-            var inputString = $""; // TODO
 
-            var inputBytes = Encoding.ASCII.GetBytes(inputString);
-            var outputBytes = sha256.ComputeHash(inputBytes);
+            var inputString = $"{TimeStamp}-{PreviousHash ?? ""}-{Nonce}-{Data}"; // TODO
+
+            byte[] inputBytes = Encoding.ASCII.GetBytes(inputString);
+            byte[] outputBytes = sha256.ComputeHash(inputBytes);
 
             return Base64UrlEncoder.Encode(outputBytes);
         }
@@ -47,6 +51,12 @@ namespace CP380_B1_BlockList.Models
         public void Mine(int difficulty)
         {
             // TODO
+            var leadingZeros = new string('0', difficulty);
+            while (this.Hash == null || this.Hash.Substring(0, difficulty) != leadingZeros)
+            {
+                this.Nonce++;
+                this.Hash = this.CalculateHash();
+            }
         }
     }
 }
